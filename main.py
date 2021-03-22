@@ -1,13 +1,14 @@
 import random
 import pygame
+import os
 
 pygame.init()
 pygame.font.init()
 
 pygame.display.set_caption("Flappy Circle")
 
-DEATH_FONT = pygame.font.Font("DeathFont.otf", 100)
-SCORE_FONT = pygame.font.SysFont('JetBrains Mono', 20)
+DEATH_FONT = pygame.font.Font(os.path.join("Assets","DeathFont.otf"), 100)
+SCORE_FONT = pygame.font.Font(os.path.join("Assets", "JetBrainsMono-Regular.ttf"), 20)
 
 WIDTH, HEIGHT = 800, 700
 FPS = 60
@@ -20,13 +21,13 @@ pygame.time.set_timer(NEWPIPE, TIME)
 BIRD_RADIUS = 20
 BIRD_GRAV = 0.3
 BIRD_FLAP_STRENGHT = 11
-BIRD_IMAGE = pygame.image.load('Bird.png').convert_alpha()
+BIRD_IMAGE = pygame.image.load(os.path.join("Assets", "Bird.png")).convert_alpha()
 
 PIPE_WIDTH = 70
 PIPE_SPEED = 4
 PIPE_GAP = 160
 
-AIR = pygame.transform.scale(pygame.image.load("air.jpg"), (WIDTH, HEIGHT))
+AIR = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "air.jpg")), (WIDTH, HEIGHT))
 
 BLUE_BACKGROUND = (50, 150, 255)
 YELLOW = (255,255,0)
