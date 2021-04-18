@@ -1,14 +1,27 @@
 import random
-import pygame
 import os
+import sys
+import pygame
 
 pygame.init()
 pygame.font.init()
 
 pygame.display.set_caption("Flappy Circle")
 
-DEATH_FONT = pygame.font.Font(os.path.join("Assets","DeathFont.otf"), 100)
-SCORE_FONT = pygame.font.Font(os.path.join("Assets", "JetBrainsMono-Regular.ttf"), 20)
+def resource_path(relative_path):
+    try:
+    # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
+DEATH_FONT = pygame.font.Font(resource_path(os.path.join(
+    "Assets","DeathFont.otf")), 100)
+SCORE_FONT = pygame.font.Font(resource_path(os.path.join(
+    "Assets", "JetBrainsMono-Regular.ttf")), 20)
 
 WIDTH, HEIGHT = 800, 700
 FPS = 60
@@ -21,13 +34,13 @@ pygame.time.set_timer(NEWPIPE, TIME)
 BIRD_RADIUS = 20
 BIRD_GRAV = 0.3
 BIRD_FLAP_STRENGHT = 11
-BIRD_IMAGE = pygame.image.load(os.path.join("Assets", "Bird.png")).convert_alpha()
+BIRD_IMAGE = pygame.image.load(resource_path((os.path.join("Assets", "Bird.png"))))
 
 PIPE_WIDTH = 70
 PIPE_SPEED = 4
 PIPE_GAP = 160
 
-AIR = pygame.transform.scale(pygame.image.load(os.path.join("Assets", "air.jpg")), (WIDTH, HEIGHT))
+AIR = pygame.transform.scale(pygame.image.load(resource_path(os.path.join("Assets", "air.jpg"))), (WIDTH, HEIGHT))
 
 BLUE_BACKGROUND = (50, 150, 255)
 YELLOW = (255,255,0)
@@ -51,7 +64,7 @@ class Bird():
             self.vel = max(self.vel, -5)
             self.flap = False
         self.bird.y += self.vel
-        self.bird.y = max(min(HEIGHT-BIRD_RADIUS, self.bird.y), 0 + BIRD_RADIUS )  
+        self.bird.y = max(min(HEIGHT-BIRD_RADIUS, self.bird.y), 0 + BIRD_RADIUS )
 
     def collision(self, pipe_list):
         for pipe in pipe_list:
@@ -62,6 +75,8 @@ class Bird():
                 else:
                     if self.bird.y + BIRD_RADIUS > pipe.pipe.y and self.bird.y - BIRD_RADIUS < HEIGHT: # pylint: disable=line-too-long
                         self.dead = True
+        if self.bird.y >= HEIGHT - BIRD_RADIUS or self.bird.y <= 0 + BIRD_RADIUS:
+            self.dead = True
 
     def update_score(self):
         if self.score_list:
@@ -83,8 +98,9 @@ class Pipe():  # pylint: disable=too-few-public-methods
 
 # create a new pair of pipes
 def create_pipe(bird, pipe_list):
-    start_gap = random.randint(150, HEIGHT - 150 - PIPE_GAP)
-    end_gap = start_gap + PIPE_GAP
+    pipe_gap = random.randint(130, 180)
+    start_gap = random.randint(120, HEIGHT - 120 - pipe_gap)
+    end_gap = start_gap + pipe_gap
     pipe1 = Pipe(0, start_gap, True)
     pipe2 = Pipe(end_gap, HEIGHT, False)
     pipe_list.append(pipe1)
@@ -95,12 +111,12 @@ def create_pipe(bird, pipe_list):
 # return or update the highscore
 def handle_highscore(highscore=0, new_score=False):
     if new_score and new_score > int(highscore):
-        with open('highscore.txt', 'w') as file:
+        with open("highscore.txt", 'w') as file:
             file.write(str(new_score))
             return True
     else:
         try:
-            with open('highscore.txt', 'r') as file:
+            with open("highscore.txt", 'r') as file:
                 highscore = file.read()
                 return highscore
         except FileNotFoundError:
